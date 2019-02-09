@@ -1,0 +1,34 @@
+kind: helm-release
+apiVersion: 1.1
+build:
+  context: .
+  dockerfile: Dockerfile
+install:
+  chart: charts/webfrontend
+  values:
+  - values.dev.yaml?
+  - secrets.dev.yaml?
+  set:
+    replicaCount: 1
+    image:
+      repository: webfrontend
+      tag: $(tag)
+      pullPolicy: Never
+    ingress:
+      annotations:
+        kubernetes.io/ingress.class: traefik-azds
+      hosts:
+      # This expands to [space.s.]webfrontend.<guid>.<region>.aksapp.io
+      - $(spacePrefix)webfrontend$(hostSuffix)
+configurations:
+  develop:
+    build:
+      dockerfile: Dockerfile.develop
+      useGitIgnore: true
+    container:
+      sync:
+      - "**/**"
+      iterate:
+        processesToKill: [java]
+        buildCommands:
+        - [mvn, package, -Dmaven.test.skip=true, -Dcheckstyle.skip=true, -Dmaven.javadoc.skip=true]
