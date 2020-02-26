@@ -71,7 +71,7 @@ jobs:
           renderEngine: 'helm'
           helmChart: './samples/BikeSharingApp/Bikes/charts/bikes/'
           releaseName: ${{steps.generate-release-name.outputs.result}}
-          version: v2.16.3
+          helm-version: v2.16.3
           overrides: |
             image.repository:${{ secrets.CONTAINER_REGISTRY }}/bikes
             image.tag:${{ github.sha }}
